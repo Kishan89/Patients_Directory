@@ -10,51 +10,65 @@ The app provides a clean UI to browse, search, filter, and manage patient record
 
 ### Core Features
 
-API Integration: Local API endpoint (/api/patients) reads from patients.json.
-View Patients: Displays a paginated list of patients with details (name, age, contact, medical issue).
-Search Patients: Search by patient ID, name, phone, or email.
-Filter: Filter patients by medical issue.
-Sorting: Sort records by ID, Name, or Age (asc/desc).
-Pagination: Navigate through patient records with page controls.
-Loading & Error Handling: User feedback while fetching or on API errors.
+- **API Integration:** Local API endpoint (/api/patients) reads from patients.json.
+- **View Patients:** Displays a paginated list of patients with details (name, age, contact, medical issue).
+- **Search Patients:** Search by patient ID, name, phone, or email.
+- **Filter:** Filter patients by medical issue.
+- **Sorting:** Sort records by ID, Name, or Age (asc/desc).
+- **Pagination:** Navigate through patient records with page controls.
+- **Loading & Error Handling:** User feedback while fetching or on API errors.
 
 ### Bonus Features
 
-Debounced Search: Avoids unnecessary API calls for better performance.
-Responsive Layout: Works across desktop and mobile.
-Well-structured Code: TypeScript strict mode enabled, modular components, custom hooks.
+- **Debounced Search:** Avoids unnecessary API calls for better performance.
+- **Responsive Layout:** Works across desktop and mobile.
+- **Well-structured Code:** TypeScript strict mode enabled, modular components, custom hooks.
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
-<img src="assets/Demo/SignUp.jpeg" width="250"/> <img src="assets/Demo/Login.jpeg" width="250"/>
-<img src="assets/Demo/ForgotPassword.jpeg" width="250"/> <img src="assets/Demo/HomeScreen.jpeg" width="250"/>
-<img src="assets/Demo/Edit.jpeg" width="250"/> 
+### Desktop View
+![Desktop View of Patient Directory](public/demo/Desktop.png)
+
+### Mobile View
+![Mobile View of Patient Directory](public/demo/Mobile.png)
+
+---
 
 ## Tech Stack
 
-Framework: Next.js (App Router)
-Language: TypeScript
-Styling: Tailwind CSS v3
-UI Components: Custom + optional shadcn/ui
-State Management: React Hooks (useState, useEffect, custom debounce hook)
+**Framework: Next.js (App Router)**
+- Language: TypeScript
+- Styling: Tailwind CSS v3
+- UI Components: Custom + optional shadcn/ui
+- State Management: React Hooks (useState, useEffect, custom debounce hook)
 
 ---
+## 🚀 Setup & Installation
 
-## Setup & Installation
+Before you begin, ensure you have [Node.js](https://nodejs.org/) (v18 or later) installed on your machine.
 
-1. **Clone the repository**
-   ```bash
-git clone https://github.com/Kishan89/Patients_Directory
-cd Patients_Directory
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/Kishan89/Patients_Directory](https://github.com/Kishan89/Patients_Directory)
+    ```
 
+2.  **Navigate to the project directory:**
+    ```bash
+    cd Patients_Directory
+    ```
 
-2. **Install dependencies**
-   npm install
+3.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-3. **Run the app**
-npm run dev
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+The application will be available at `http://localhost:3000`.
 
 ## Project Structure
 
