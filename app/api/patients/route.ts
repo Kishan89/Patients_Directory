@@ -1,4 +1,3 @@
-// app/api/patients/route.ts
 import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
@@ -37,8 +36,6 @@ export async function GET(req: Request) {
     const data = await loadData();
 
     let filtered = data;
-
-    // Search across id, name, phone, email
     if (q) {
       filtered = filtered.filter(p => {
         const phone = p.contact?.[0]?.number || '';
@@ -50,12 +47,9 @@ export async function GET(req: Request) {
       });
     }
 
-    // Filter by medical_issue
     if (medical) {
       filtered = filtered.filter(p => (p.medical_issue || '').toLowerCase() === medical);
     }
-
-    // Sorting (support 'age' and 'patient_name' or numeric)
     filtered = filtered.sort((a, b) => {
       const aVal = (a as any)[sortBy];
       const bVal = (b as any)[sortBy];
