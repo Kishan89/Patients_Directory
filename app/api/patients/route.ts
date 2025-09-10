@@ -28,14 +28,16 @@ export async function GET(req: Request) {
     const params = url.searchParams;
     const limit = Math.max(1, Math.min(100, Number(params.get('limit') || '20')));
     const page = Math.max(1, Number(params.get('page') || '1'));
-    const q = (params.get('q') || '').toLowerCase().trim(); // search
+    const q = (params.get('q') || '').toLowerCase().trim();
     const medical = params.get('medical')?.toLowerCase()?.trim() || null;
+    const minAge = Number(params.get('minAge') || '0');
+    const maxAge = Number(params.get('maxAge') || '150');
     const sortBy = params.get('sortBy') || 'patient_id';
     const order = (params.get('order') || 'asc').toLowerCase() === 'desc' ? 'desc' : 'asc';
 
     const data = await loadData();
-
     let filtered = data;
+
     if (q) {
       filtered = filtered.filter(p => {
         const phone = p.contact?.[0]?.number || '';
@@ -50,6 +52,11 @@ export async function GET(req: Request) {
     if (medical) {
       filtered = filtered.filter(p => (p.medical_issue || '').toLowerCase() === medical);
     }
+
+    if (minAge > 0 || maxAge < 150) {
+      filtered = filtered.filter(p => p.age >= minAge && p.age <= maxAge);
+    }
+
     filtered = filtered.sort((a, b) => {
       const aVal = (a as any)[sortBy];
       const bVal = (b as any)[sortBy];

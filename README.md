@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏥 Patient Directory App
 
-## Getting Started
+A complete Patient Management web application built with Next.js (App Router), TypeScript, and Tailwind CSS v3.
+The app provides a clean UI to browse, search, filter, and manage patient records from a local dataset served through a custom API.
 
-First, run the development server:
+---
 
-```bash
+
+## Features
+
+### Core Features
+
+API Integration: Local API endpoint (/api/patients) reads from patients.json.
+View Patients: Displays a paginated list of patients with details (name, age, contact, medical issue).
+Search Patients: Search by patient ID, name, phone, or email.
+Filter: Filter patients by medical issue.
+Sorting: Sort records by ID, Name, or Age (asc/desc).
+Pagination: Navigate through patient records with page controls.
+Loading & Error Handling: User feedback while fetching or on API errors.
+
+### Bonus Features
+
+Debounced Search: Avoids unnecessary API calls for better performance.
+Responsive Layout: Works across desktop and mobile.
+Well-structured Code: TypeScript strict mode enabled, modular components, custom hooks.
+
+---
+
+## Screenshots
+
+<img src="assets/Demo/SignUp.jpeg" width="250"/> <img src="assets/Demo/Login.jpeg" width="250"/>
+<img src="assets/Demo/ForgotPassword.jpeg" width="250"/> <img src="assets/Demo/HomeScreen.jpeg" width="250"/>
+<img src="assets/Demo/Edit.jpeg" width="250"/> 
+
+## Tech Stack
+
+Framework: Next.js (App Router)
+Language: TypeScript
+Styling: Tailwind CSS v3
+UI Components: Custom + optional shadcn/ui
+State Management: React Hooks (useState, useEffect, custom debounce hook)
+
+---
+
+## Setup & Installation
+
+1. **Clone the repository**
+   ```bash
+git clone https://github.com/Kishan89/Patients_Directory
+cd Patients_Directory
+
+
+2. **Install dependencies**
+   npm install
+
+3. **Run the app**
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+## Project Structure
+
+```markdown
+
+📁 patient-directory/
+├── app/
+│   ├── api/
+│   │   └── patients/
+│   │       └── route.ts      # API route for handling patient data requests
+│   ├── components/
+│   │   ├── PatientsPage.tsx  # Main UI component for the patient directory page
+│   │   └── PatientsTable.tsx # Component for rendering the data table
+│   ├── hooks/
+│   │   └── useDebounce.ts    # Custom hook to debounce search input
+│   ├── globals.css           # Global styles for the application
+│   ├── layout.tsx            # The root layout component for all pages
+│   ├── page.tsx              # The entry point and main page for the app
+│   └── favicon.ico           # Application's browser icon
+├── data/
+│   └── patients.json         # Static JSON file containing patient data
+├── public/
+│   └──                       # Folder for static assets (images, fonts, etc.)
+├── .gitignore                # Specifies files for Git to ignore
+├── next.config.ts            # Configuration for the Next.js framework
+├── package.json              # Lists project dependencies and scripts
+├── tailwind.config.js        # Configuration file for Tailwind CSS
+└── tsconfig.json             # TypeScript compiler options
+
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

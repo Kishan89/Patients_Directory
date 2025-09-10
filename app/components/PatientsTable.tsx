@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDebounce } from '../hooks/useDebounce';
 
 type Patient = {
@@ -17,23 +17,35 @@ export default function PatientsTable() {
   const [limit] = useState(20);
   const [q, setQ] = useState('');
   const debouncedQ = useDebounce(q, 350);
-  const [medical, setMedical] = useState('');
+  
+  const [filters, setFilters] = useState({
+    medical: '',
+    minAge: '',
+    maxAge: '',
+  });
+
+  const [appliedFilters, setAppliedFilters] = useState(filters);
+  const [showFilters, setShowFilters] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+  
   const [sortBy, setSortBy] = useState('patient_id');
-  const [order, setOrder] = useState<'asc'|'desc'>('asc');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    async function fetchData(){
+    async function fetchData() {
       setLoading(true); setError(null);
       try {
         const params = new URLSearchParams();
         params.set('limit', String(limit));
         params.set('page', String(page));
         if (debouncedQ) params.set('q', debouncedQ);
-        if (medical) params.set('medical', medical);
+        if (appliedFilters.medical) params.set('medical', appliedFilters.medical);
+        if (appliedFilters.minAge) params.set('minAge', appliedFilters.minAge);
+        if (appliedFilters.maxAge) params.set('maxAge', appliedFilters.maxAge);
         if (sortBy) { params.set('sortBy', sortBy); params.set('order', order); }
 
         const res = await fetch(`/api/patients?${params.toString()}`);
@@ -49,38 +61,82 @@ export default function PatientsTable() {
     }
     fetchData();
     return () => { mounted = false; }
-  }, [page, limit, debouncedQ, medical, sortBy, order]);
+  }, [page, limit, debouncedQ, appliedFilters, sortBy, order]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setShowFilters(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+  const handleApplyFilters = () => {
+    setAppliedFilters(filters);
+    setPage(1);
+    setShowFilters(false);
+  };
+
+  const handleClearFilters = () => {
+    const cleared = { medical: '', minAge: '', maxAge: '' };
+    setFilters(cleared);
+    setAppliedFilters(cleared);
+    setPage(1);
+    setShowFilters(false);
+  };
+  
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
     <div className="px-8 pb-8">
-      <div className="flex items-center justify-between bg-slate-50 border rounded p-4">
-        <div className="flex items-center gap-3 w-full pr-4">
-          <div className="relative flex-1">
-            <input
-              value={q}
-              onChange={e => { setQ(e.target.value); setPage(1); }}
-              placeholder="Search by invoice number, name, amount..."
-              className="w-full bg-white border p-3 rounded shadow-sm placeholder:text-slate-400"
-            />
-            <svg className="absolute right-3 top-3 opacity-40" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2"/></svg>
-          </div>
-
-          <button className="px-4 py-2 border rounded bg-white flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 10h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M3 14h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M3 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-            Filter
-          </button>
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-slate-50 border rounded p-4">
+        <div className="relative w-full md:flex-1">
+          <input
+            value={q}
+            onChange={e => { setQ(e.target.value); setPage(1); }}
+            placeholder="Search by ID, name, phone, or email..."
+            className="w-full bg-white border p-3 rounded shadow-sm placeholder:text-slate-400"
+          />
+          <svg className="absolute right-3 top-3 opacity-40" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" /></svg>
         </div>
 
-        <div className="ml-6">
-          <select value={medical} onChange={e => { setMedical(e.target.value); setPage(1); }} className="border px-3 py-2 rounded bg-white">
-            <option value="">All issues</option>
-            <option value="fever">Fever</option>
-            <option value="headache">Headache</option>
-            <option value="sprained ankle">Sprained ankle</option>
-            <option value="rash">Rash</option>
-          </select>
+        <div className="relative w-full md:w-auto" ref={filterRef}>
+          <button onClick={() => setShowFilters(s => !s)} className="w-full md:w-auto px-4 py-3 border rounded bg-white flex items-center justify-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Filter
+          </button>
+          
+          {showFilters && (
+            <div className="absolute top-full right-0 mt-2 w-80 bg-white border rounded-lg shadow-xl z-10 p-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Medical Issue</label>
+                  <select value={filters.medical} onChange={e => setFilters(f => ({ ...f, medical: e.target.value }))} className="w-full border px-3 py-2 rounded bg-white">
+                    <option value="">Any</option>
+                    <option value="fever">Fever</option>
+                    <option value="headache">Headache</option>
+                    <option value="sprained ankle">Sprained Ankle</option>
+                    <option value="rash">Rash</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Age Range</label>
+                  <div className="flex items-center gap-2">
+                    <input type="number" placeholder="Min" value={filters.minAge} onChange={e => setFilters(f => ({ ...f, minAge: e.target.value }))} className="w-full border p-2 rounded" />
+                    <span className="text-slate-500">-</span>
+                    <input type="number" placeholder="Max" value={filters.maxAge} onChange={e => setFilters(f => ({ ...f, maxAge: e.target.value }))} className="w-full border p-2 rounded" />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 flex items-center justify-between">
+                <button onClick={handleClearFilters} className="text-sm text-slate-600 hover:underline">Clear Filters</button>
+                <button onClick={handleApplyFilters} className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700">Apply</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -102,7 +158,6 @@ export default function PatientsTable() {
                 <th className="text-left py-3 pr-6 w-[260px]">Email ID</th>
               </tr>
             </thead>
-
             <tbody className="text-sm text-slate-700">
               {data.map((p) => {
                 const phone = p.contact?.[0]?.number || 'N/A';
@@ -113,13 +168,12 @@ export default function PatientsTable() {
                 return (
                   <tr key={p.patient_id} className="border-t hover:bg-slate-50">
                     <td className="py-4 pr-6">
-                      <div className="text-xs text-slate-500">{String(p.patient_id).padStart(3,'0')}</div>
+                      <div className="text-xs text-slate-500">{String(p.patient_id).padStart(3, '0')}</div>
                     </td>
-
                     <td className="py-4 pr-6">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-sm font-medium text-slate-600">
-                          { (p.patient_name || '').split(' ').map(s=>s[0]).slice(0,2).join('') }
+                          {(p.patient_name || '').split(' ').map(s => s[0]).slice(0, 2).join('')}
                         </div>
                         <div className="min-w-0">
                           <div className="text-slate-900 font-medium truncate">{p.patient_name}</div>
@@ -127,7 +181,6 @@ export default function PatientsTable() {
                         </div>
                       </div>
                     </td>
-
                     <td className="py-4 pr-6">{p.age}</td>
                     <td className="py-4 pr-6 font-medium">{p.medical_issue || 'N/A'}</td>
                     <td className="py-4 pr-6">{address}</td>
@@ -145,11 +198,11 @@ export default function PatientsTable() {
         )}
       </div>
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm text-slate-600">Showing {total === 0 ? 0 : (page-1)*limit+1} - {Math.min(total, page*limit)} of {total} results</div>
+        <div className="text-sm text-slate-600">Showing {total === 0 ? 0 : (page - 1) * limit + 1} - {Math.min(total, page * limit)} of {total} results</div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page <= 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
           <div className="text-sm">Page {page} / {totalPages}</div>
-          <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page >= totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
         </div>
       </div>
     </div>
