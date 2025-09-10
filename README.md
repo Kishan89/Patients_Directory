@@ -25,6 +25,10 @@ The app provides a clean UI to browse, search, filter, and manage patient record
 - **Well-structured Code:** TypeScript strict mode enabled, modular components, custom hooks.
 
 ---
+## Live Demo
+
+You can access the deployed application here:  
+👉 [Patients Directory Live App](https://patients-directory-3bxv.vercel.app/)
 
 ## 📸 Screenshots
 
